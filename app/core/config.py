@@ -1,4 +1,4 @@
-from pydantic_settings import BaseSettings
+from pydantic_settings import BaseSettings, SettingsConfigDict
 from pydantic import Field
 
 class Settings(BaseSettings):
@@ -9,9 +9,11 @@ class Settings(BaseSettings):
 
     FAL_API_KEY: str | None = None
     REPLICATE_API_TOKEN: str | None = None
+    HUGGINGFACE_API_TOKEN: str | None = None
 
-    class config:
-        env_file = ".env"
-        extra = "ignore"
+    model_config = SettingsConfigDict(
+        env_file=".env",
+        extra="ignore"
+    )
 
 settings = Settings()
