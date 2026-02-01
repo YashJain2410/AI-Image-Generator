@@ -10,7 +10,7 @@ STYLES: dict[str, StyleDefinition] = {
         preview_image_url="",
 
         style_reference_images=[
-            "https://www.whosthat360.com/fashion/photos-anushka-sen-shares-perfect-sun-kissed-pictures-5461215",
+            "https://c.ndtvimg.com/2024-04/sg6j96k8_photos-anushka-sen-shares-perfect-sunkissed-pictures_625x300_17_April_24.jpg",
         ],
 
         style_type="ip_adapter",

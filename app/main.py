@@ -5,6 +5,7 @@ from app.core.logging import setup_logging
 from app.api.v1.routes.health import router as health_router
 from app.api.v1.routes.test_generate import router as test_generate_router
 from app.api.v1.routes.styles import router as styles_router
+from app.api.v1.routes.test_service_generate import router as test_service_generate_router
 
 def create_app() -> FastAPI:
     setup_logging()
@@ -30,6 +31,12 @@ def create_app() -> FastAPI:
         styles_router,
         prefix=settings.API_V1_PREFIX,
         tags = ["Styles"]
+    )
+
+    app.include_router(
+        test_service_generate_router,
+        prefix = settings.API_V1_PREFIX,
+        tags=["Image Generation Service"]
     )
 
     return app
