@@ -20,17 +20,29 @@ class ReplicateProvider(BaseImageProvider):
         }
 
     async def generate(self, data: ImageGenerationInput) -> List[ImageResult]:
-        payload = {
-            "version": self.model,
-            "input": {
-                "prompt": data.prompt,
-                "num_outputs": data.num_images
-            }
+
+        # Base input (text -> image)
+        model_input: dict = {
+            "prompt": data.prompt,
+            "num_outputs": data.num_images,
         }
 
+        # img2img (product image)
         if data.reference_image_url:
-            payload["input"]["image"] = data.reference_image_url
-            payload["input"]["strength"] = data.strength
+            model_input["image"] = data.reference_image_url
+            model_input["strength"] = data.strength
+
+        # Style image (IP-Adapter-like support) | Replicate models differ, we pass this only if provided
+        if(data.style_type == "ip_adapter" and data.style_reference_images and len(data.style_reference_images) > 0):
+            model_input["style_image"] = data.style_reference_images[0]     # Common naming used by replicate models
+
+        if data.negative_prompt:
+            model_input["negative_prompt"] = data.negative_prompt
+
+        payload = {
+            "version": self.model,
+            "input": model_input,
+        }
 
         async with httpx.AsyncClient(timeout=120) as client:
             create_resp = await client.post(
@@ -40,7 +52,9 @@ class ReplicateProvider(BaseImageProvider):
             )
 
             if create_resp.status_code != 201:
-                raise RuntimeError(create_resp.text)
+                raise RuntimeError(
+                    f"Replicate create failed: {create_resp.text}"
+                )
             
             prediction = create_resp.json()
             prediction_url = prediction["urls"]["get"]
@@ -59,11 +73,18 @@ class ReplicateProvider(BaseImageProvider):
                     break
 
                 if result["status"] == "failed":
-                    raise RuntimeError("Replicate generation failed")
+                    raise RuntimeError(
+                        f"Replicate generation failed: {result.get('error')}"
+                    )
+                
+        output = result["output"]
+
+        if isinstance(output, str):
+            output = [output]
                 
         images: List[ImageResult] = []
 
-        for url in result["output"]:
+        for url in output:
             images.append(
                 ImageResult(
                     image_url=url,

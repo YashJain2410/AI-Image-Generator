@@ -6,6 +6,10 @@ class ImageGenerationInput(BaseModel):
     negative_prompt: Optional[str] = None
 
     reference_image_url: Optional[str] = None
+    
+    style_reference_images: Optional[List[str]] = None
+    style_type: Optional[str] = None
+
     strength: float = 0.75
 
     image_size: str = "1024x1024"

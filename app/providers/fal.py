@@ -30,6 +30,13 @@ class FalProvider(BaseImageProvider):
             payload["image_url"] = data.reference_image_url
             payload["strength"] = data.strength
 
+        # IP-Adapter style transfer
+        if (data.style_type == "ip_adapter" and data.style_reference_images and len(data.style_reference_images) > 0):
+            payload["ip_adapter_image_url"] = data.style_reference_images[0]
+
+        if data.negative_prompt:
+            payload["negative_prompt"] = data.negative_prompt
+
         async with httpx.AsyncClient(timeout=90) as client:
             response = await client.post(
                 self.api_url,
