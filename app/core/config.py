@@ -11,6 +11,11 @@ class Settings(BaseSettings):
     REPLICATE_API_TOKEN: str | None = None
     HUGGINGFACE_API_TOKEN: str | None = None
 
+    AWS_ACCESS_KEY_ID: str | None = None
+    AWS_SECRET_ACCESS_KEY: str | None = None
+    AWS_REGION: str | None = None
+    AWS_S3_BUCKET: str | None = None
+
     model_config = SettingsConfigDict(
         env_file=".env",
         extra="ignore"
